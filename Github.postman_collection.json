@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "67924338-93e7-469b-90f9-bec0e0d1e13e",
+		"name": "Github",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25943021"
+	},
+	"item": [
+		{
+			"name": "GetCode",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://github.com/login/oauth/authorize?client_id=a706cc6961ec96a4f209&redirect_uri=https://oauth.pstmn.io/v1/browser-callback&scope=read:repo_hook,\nread:public_key,\nread:org,\nnotifications,\ngist,\nadmin:enterprise,\nadmin:repo_hook,\nadmin:org,\nadmin:public_ke,\nadmin:org_hook,\nrepo,\nrepo:status,\nrepo_deployment,\npublic_repo,\ndelete_repo,\nwrite:org,\nwrite:public_key,\nwrite:repo_hook,\nread:user,\nuser:email,\nuser:follow\n",
+					"protocol": "https",
+					"host": [
+						"github",
+						"com"
+					],
+					"path": [
+						"login",
+						"oauth",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "a706cc6961ec96a4f209"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://oauth.pstmn.io/v1/browser-callback"
+						},
+						{
+							"key": "scope",
+							"value": "read:repo_hook,\nread:public_key,\nread:org,\nnotifications,\ngist,\nadmin:enterprise,\nadmin:repo_hook,\nadmin:org,\nadmin:public_ke,\nadmin:org_hook,\nrepo,\nrepo:status,\nrepo_deployment,\npublic_repo,\ndelete_repo,\nwrite:org,\nwrite:public_key,\nwrite:repo_hook,\nread:user,\nuser:email,\nuser:follow\n"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAccessToken",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://github.com/login/oauth/access_token?client_id=a706cc6961ec96a4f209&client_secret=dea5c7a9f22502b5d10aacec332b7fff8cd6ee8f&code=39d6dbd19e864115d252&redirect_uri=https://oauth.pstmn.io/v1/browser-callback",
+					"protocol": "https",
+					"host": [
+						"github",
+						"com"
+					],
+					"path": [
+						"login",
+						"oauth",
+						"access_token"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "a706cc6961ec96a4f209"
+						},
+						{
+							"key": "client_secret",
+							"value": "dea5c7a9f22502b5d10aacec332b7fff8cd6ee8f"
+						},
+						{
+							"key": "code",
+							"value": "39d6dbd19e864115d252"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://oauth.pstmn.io/v1/browser-callback"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

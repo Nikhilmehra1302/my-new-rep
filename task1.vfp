@@ -1,0 +1,384 @@
+    <apex:page controller="task1controller" standardStylesheets="true" id="pg">
+    
+    <apex:slds />
+        <script>
+    
+    			function function1(){
+                    /*
+                var accName=document.getElementById('pg:j_id2:j_id4:0:accName');
+                    // console.log(accName)
+                 
+                    if(accName.value.length==0){
+                    	accName.style.border='1px Solid Red';
+                    }
+                    
+                
+                    
+    			var accRating=document.getElementById('pg:j_id2:j_id4:0:j_id8');
+    			console.log(accRating.value);
+                    
+                	if(accRating.value.match('Hot')){
+                    	accRating.nextElementSibling.textContent='Rating is'+accRating.value;                       
+                    	accRating.nextElementSibling.style.color='red';
+                    }
+                       
+    				else if(accRating.value.match('Warm')){
+                    	accRating.nextElementSibling.textContent='Rating is'+accRating.value;              
+                    	accRating.nextElementSibling.style.color='green';
+                        }
+                    
+                	else if(accRating.value.match('Cold')){
+                    	accRating.nextElementSibling.textContent='Rating is'+accRating.value;
+                    	accRating.nextElementSibling.style.color='blue';
+                		}
+                    
+    				else{
+                    	accRating.nextElementSibling.textContent='Rating is'+'None';
+                        accRating.nextElementSibling.style.display='none';
+                    }*/
+                    
+                    //Phone Number Validation
+                    
+                var accPhone=document.getElementById('pg:mainForm:j_id5:0:accPhone');
+                    //console.log(accPhone.value)
+                    
+                        var phoneValue=accPhone.value
+                    
+                    //var regx=/^\d{10}$/;
+                    var regx=/^\(\d{3}\)\s\d{3}-\d{4}$/;
+                    
+                     
+                    
+                   if(phoneValue.match(regx)){	
+                       
+                        accPhone.classList.remove('slds-has-error');   
+                      	accPhone.nextElementSibling.style.display='none';
+                    	}
+                    else{ 
+                    	accPhone.nextElementSibling.style.display='block';
+                          accPhone.classList.add('slds-has-error');
+                    }
+                 
+    }
+    
+    			function ValidatePhone(id){
+                	var tem=document.getElementById(id);
+                    var phoneValue=tem.value;
+                    
+                    /* var regx=/^\d{10}$/;
+                     if(phoneValue.length!=10){
+                         tem.nextElementSibling.innerText='Plz Enter 10 Digit Only!"+" And Wrong Validation'; 
+                      	alert("Plz Enter 10 Digit Only!"+" And Wrong Validation");
+                	}*/	
+                    
+                    
+                    var regx=/^\(\d{3}\)\s\d{3}-\d{4}$/;
+                 
+                      if(phoneValue.match(regx)){
+                      console.log(phoneValue.match(regx)); 
+                          
+                        tem.classList.remove('slds-has-error');   
+                          tem.nextElementSibling.style.display='none';
+                    	}
+                      else{
+                          tem.classList.add('slds-has-error');
+                          // tem.nextElementSibling.textContent='Plz Enter 10 Digit Only!"+" And Wrong Validation'
+                          
+                          tem.nextElementSibling.style.display='block';
+                      }
+                
+                    
+            }
+    
+    		
+                function ValidateEmail(str1) {
+                  	let temp = document.getElementById(str1);
+                    let emailValue = temp.value;
+                    
+					var regx =/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+                    
+					if (emailValue.match(regx)){
+                        // console.log(emailValue.match(regx));
+                        
+                        temp.classList.remove('slds-has-error');   
+                      temp.nextElementSibling.style.display='none';
+      				 }
+                     else
+                         {
+                             temp.nextElementSibling.style.display='Block';
+                             temp.classList.add('slds-has-error');
+                             
+                             //    alert('Not Validated');
+                    }
+    			}
+    		
+    			
+    			function ValidateFirstName(id){
+                var fN=document.getElementById(id);
+                    //  console.log(fN.value)
+                
+                    // console.log(lN.value)
+                    var regx=/[A-Za-z]+$/;
+                    
+                    
+                    if(fN.value.match(regx)){
+                        
+                        fN.classList.remove('slds-has-error');   
+                    	fN.nextElementSibling.style.display='none';
+                    }
+                    else if(!fN.value.match(regx)){
+                        fN.classList.add('slds-has-error');    
+                    	fN.nextElementSibling.style.display='Block';
+                    }
+                
+                    
+                
+            }
+    		
+    		function ValidateLastName(id){
+            
+                var lN=document.getElementById(id);
+                console.log(lN.value)
+                /*
+                var regx=/[A-Za-z]+$/;
+                   if(lN.value.match(regx)){
+                        
+                        lN.classList.remove('slds-has-error');   
+                    	lN.nextElementSibling.style.display='none';
+                    }
+                    else{
+                        lN.classList.add('slds-has-error');           
+                    	lN.nextElementSibling.style.display='Block';
+                    }*/
+                
+            }
+        </script>         
+             
+    	<apex:outputPanel id="pgB">
+            
+            <!--Button Form-->
+    		<apex:form id="mainForm">
+             <apex:commandButton id="edit" rendered="{!IF(btnField=true,true,false)}" rerender="pgB"  action="{!editP}"
+                                 value="Edit" styleClass="slds-button slds-button_neutral"   style="margin-top:1rem" />
+                
+          <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="pgB" action="{!OnSave}"
+                              value="Save"  styleClass="slds-button slds-button_success " style="margin-top:1rem" />
+                 
+                 <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="pgB"
+               action="{!OnCancel}" value="CANCEL" styleClass="slds-button slds-button_text-destructive" style="margin-top:1rem" />
+				
+            	
+            
+            <!--Button Form End-->
+            
+                <br/>
+            <div styleClass="TableA" class="slds-p-around_small " style="border:1px solid #ef127a">
+             
+                    <h1 class="slds-text-heading_large" style="color:blue;padding-top:10px">Account Records</h1>
+                <br/>
+                
+              <table style="height:5rem;" class="slds-table slds-table_cell-buffer slds-table_bordered" 
+                     aria-labelledby="element-with-table-label other-element-with-table-label">
+                
+            <apex:repeat value="{!A}" var="acc">
+                
+                <tr class="slds-line-height_reset">
+               
+                 <th class="" scope="col" style="background-color:rgb(243, 243, 243)">
+                        <div class="slds-truncate" title="Name">Name</div>
+                  </th>  
+                          
+               <td data-label="Account Name">
+                   <apex:outputField  rendered="{!IF(showField=false,true,false)}" value="{!acc.Name}" />
+                   <apex:inputField  rendered="{!IF(showField=true,true,false)}" id="accName" onchange="function1()"  value="{!acc.Name}" />
+                   <div class="slds-form-element__help" style="display:none;color:red" id="accNameS" >Enter a value</div>
+                   
+                 </td>  
+                     
+                </tr>
+                
+                <tr class="slds-line-height_reset">
+                
+                
+                 <th class="" scope="col" style="background-color:rgb(243, 243, 243)">
+                        <div class="slds-truncate" title="Name">Phone</div>
+                  </th>  
+               
+               <td data-label="Account Phone">
+                   
+                   <apex:outputField  rendered="{!IF(showField=false,true,false)}" value="{!acc.Phone}" />
+                   <apex:inputField rendered="{!IF(showField=true,true,false)}" id="accPhone"	onkeyup="function1()"
+                                    value="{!acc.Phone}" />
+                 	<div class="slds-form-element__help" style="display:none;color:red"  id="err">Enter Valid Phone Number</div>
+                 </td>  
+                    
+                </tr>
+                
+                
+                <tr class="slds-line-height_reset">
+                
+                
+                 <th class="" scope="col" style="background-color:rgb(243, 243, 243)">
+                        <div class="slds-truncate" title="Name">Rating</div>
+                  </th> 
+                   
+               <td data-label="Account Rating">
+                   
+                   <apex:outputField  rendered="{!IF(showField=false,true,false)}" value="{!acc.Rating}" />
+                   <apex:inputField rendered="{!IF(showField=true,true,false)}" onchange="function1()"   value="{!acc.Rating}" />
+                   <div class="slds-truncate" style="padding:5px;" ></div>
+                 </td>  
+                </tr>
+                
+                
+                <tr class="slds-line-height_reset">
+               
+                 <th class="" scope="col" style="background-color:rgb(243, 243, 243)">
+                     	
+                        <div class="slds-truncate"  title="Name">Annual Revenue</div>
+                  </th>  
+               
+                <td> 	
+                    
+                   <apex:outputField  rendered="{!IF(showField=false,true,false)}" value="{!acc.AnnualRevenue}" />
+                   <apex:inputField rendered="{!IF(showField=true,true,false)}" onfocus="function1()" value="{!acc.AnnualRevenue}" />
+                   <div class="slds-truncate" title="Name"></div>
+                 </td>
+                 
+               
+                </tr>
+                 
+                <tr>
+                    
+                </tr>    
+                    
+                 </apex:repeat>
+               
+            </table>
+                </div>  
+            
+            
+    
+             <h2 id="element-with-table-label" class="slds-text-heading_large slds-m-bottom_xx-small">Contacts Related to Account Records</h2>
+              
+        
+            
+           <apex:outputPanel id="Opanel"> 
+         <table id="table" class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                 
+                 
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th class="" scope="col">
+                        <div class="slds-truncate" title=" Name">First Name</div>
+                  </th>
+                  
+                  <th class="" scope="col">
+                    <div class="slds-truncate" title=" Name">Last Name</div>
+                  </th>
+                  
+                  <th class="" scope="col">
+                        <div class="slds-truncate" title="Phone">Phone</div>
+                  </th>
+                 
+                  
+                  <th class="" scope="col">
+                        <div class="slds-truncate" title="Email">Email</div>
+                  </th>
+              </tr>
+             </thead>
+             
+          <tbody id="tbody"> 
+             <apex:variable var="idx" value="{!0}" rendered="{!IF(cont != null, true, false)}" />
+              
+               <apex:repeat id="rep" value="{!cont}" var="c">
+      			
+        <tr id="trb" class="slds-hint-parent">
+                
+                             
+                        <td>
+                        <apex:outputField rendered="{!IF(showField=false,true,false)}"
+                              id="FirstName"            value="{!c.FirstName}" styleClass="slds-input"/>
+                            
+                        <apex:inputField rendered="{!IF(showField=true,true,false)}" value="{!c.FirstName}" id="fName"
+             				onkeyup="ValidateFirstName('{!$Component.fName}')"  styleClass="slds-input"/>
+                            
+                            <div class="slds-form-element__help" style="display:none;color:red"  id="err">
+                                <span>Write Valid Characters</span> </div>
+                        </td>
+                   		<apex:outputText >	<apex:variable var="idx" value="{!idx+1}" /></apex:outputText>
+            				
+                        <td>
+                            
+                        <apex:outputField rendered="{!IF(showField=false,true,false)}" value="{!c.LastName}" styleClass="slds-input"/>
+                        
+                        <apex:inputField rendered="{!IF(showField=true,true,false)}" value="{!c.LastName}" id="lName"
+                                   onkeyup="ValidateLastName('{!$Component.lName}')"      styleClass="slds-input"/>
+                            <div class="slds-form-element__help" style="display:none;color:red">
+                                <span>Write Validate Characters</span> </div>
+                        </td>
+                        
+                        <td>       
+                            <apex:outputField rendered="{!IF(showField=false,true,false)}" 
+                                              value="{!c.Phone}" styleClass="slds-input"/>
+                          <apex:inputField rendered="{!IF(showField=true,true,false)}" id="PhoneInputId"
+                                           onkeyup="ValidatePhone('{!$Component.PhoneInputId}')" value="{!c.Phone}" styleClass="slds-input"/>
+                            
+                 			<div class="slds-form-element__help" style="display:none;color:red"  id="err">
+                                <span>Write Valid Phone Number</span> </div>
+                        </td>
+                        
+                        
+                        <td>         
+                            <apex:outputField rendered="{!IF(showField=false,true,false)}"  value="{!c.Email}" styleClass="slds-input"/>    
+                            <apex:inputField rendered="{!IF(showField=true,true,false)}"  id="EmailInputId" value="{!c.Email}"
+                                             onkeyup="ValidateEmail('{!$Component.EmailInputId}')"  styleClass="slds-input"/>
+                            
+                 			<div class="slds-form-element__help" style="display:none;color:red"  id="err">Enter Valid Email</div>
+                           
+                        </td>
+              	
+                      	<td>
+                             <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="Opanel"
+                                                 action="{!OnDelete}" value="Delete"	styleClass="slds-button" style="margin-top:1rem">
+                            
+                                 <apex:param name="indexNumber" value="{!idx}"/>
+                            </apex:commandButton>
+       			
+            			</td>
+            
+            </tr> 
+                  
+            </apex:repeat>
+              
+                      
+          </tbody>
+          
+          
+                <!--    <apex:commandButton id="edit" rendered="{!IF(btnField=true,true,false)}"
+rerender="Opanel"  action="{!editP}"  value="Edit" styleClass="slds-button slds-button_neutral"   style="margin-top:1rem" />-->
+                <!--  {!showField}
+                   
+                 <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="Opanel" action="{!OnSave}"   value="Save"  styleClass="slds-button slds-button_success " style="margin-top:1rem" />
+                 
+                 <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="Opanel" action="{!OnCancel}" value="CANCEL" styleClass="slds-button slds-button_text-destructive" style="margin-top:1rem" />
+       	-->
+					
+				  <apex:commandButton rendered="{!IF(btnField=false,true,false)}" rerender="Opanel"
+                   action="{!OnAddCon}" value="Add Contact" styleClass="slds-button" style="margin-top:1rem" />
+       					          
+        </table>
+            
+         
+        </apex:outputPanel>    
+       			         
+        </apex:form>
+       
+        </apex:outputPanel> 
+        
+              
+             
+     
+    
+    
+</apex:page>

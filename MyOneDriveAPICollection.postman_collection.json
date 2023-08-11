@@ -1,0 +1,743 @@
+{
+	"info": {
+		"_postman_id": "5c7557ad-7da7-4b95-9b1c-4be1ac6840d1",
+		"name": "MyOneDriveAPICollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25943021"
+	},
+	"item": [
+		{
+			"name": "01 Get current user info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"Token\",null);\r",
+							"try {\r",
+							"    if (responseBody.indexOf(\"InvalidAuthenticationToken\") !== -1)\r",
+							"    {\r",
+							"        console.log(\"You need to run *On behalf of a User | Get User Access Token* request first.\");\r",
+							"    }\r",
+							"    else\r",
+							"    {\r",
+							"        if (pm.response.status === \"Forbidden\")\r",
+							"        {\r",
+							"            console.log(\"You need to add user delegated permissions in your application to at least *User.Read* in portal.azure.com and then consent as user or Grant admin consent in portal. And re-run *On behalf of a User | Get User Access Token* request to update access token. \");\r",
+							"        }\r",
+							"        else\r",
+							"        {\r",
+							"            var json = JSON.parse(responseBody);\r",
+							"            postman.setEnvironmentVariable(\"UserId\", json.id);\r",
+							"        }\r",
+							"    }\r",
+							"}\r",
+							"catch (e) {\r",
+							"    console.log(e);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.sendRequest(`https://api.getpostman.com/collections/0b3887f9-fc8b-4966-adee-d960672b0406?apikey=${pm.environment.get('ApiKey')}`,function (err,res){\r",
+							"             console.log(res.json())\r",
+							"             pm.collectionVariables.set(\"Token\",res.json().collection.variable[0].value);\r",
+							"             pm.collectionVariables.set(\"AccessToken\",res.json().collection.variable[0].value);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "SdkVersion",
+						"value": "postman-graph/v1.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/me",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02 Get drive root",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"try {\r",
+							"    if (responseBody.indexOf(\"InvalidAuthenticationToken\") !== -1)\r",
+							"    {\r",
+							"        console.log(\"You need to run *On behalf of a User | Get User Access Token* request first.\");\r",
+							"    }\r",
+							"    else\r",
+							"    {\r",
+							"        if (pm.response.status === \"Forbidden\")\r",
+							"        {\r",
+							"            console.log(\"You need to add user delegated permissions in your application to at least *Files.Read* in portal.azure.com and then consent as user or Grant admin consent in portal. And re-run *On behalf of a User | Get User Access Token* request to update access token. \");\r",
+							"        }\r",
+							"    }\r",
+							"    pm.collectionVariables.set(\"DriveID\",pm.response.json().id);\r",
+							"    var template = `\r",
+							"    <html>\r",
+							"    <body>\r",
+							"    <head>\r",
+							"   <style type=\"text/css\">\r",
+							"        body { font-size: 12px; background: #eee; padding: 16px;}\r",
+							"        td, th { font-size: 14px; background: #eee; padding: 7px; }\r",
+							"        caption{font-size:17px; font-weight:bold; margin-bottom:15px;}\r",
+							"\r",
+							"        .button{\r",
+							"            \r",
+							"            padding:3px;\r",
+							"        }\r",
+							"        table{ margin:auto; width:80%}\r",
+							"    </style>\r",
+							"      <script>     \r",
+							"        function copyToClipboard(str){        \r",
+							"            var el = document.createElement('textarea');\r",
+							"            el.value = str;\r",
+							"            el.setAttribute('readonly', '');\r",
+							"            el.style = {position: 'absolute', left: '-999px'};\r",
+							"            document.body.appendChild(el);\r",
+							"            el.select();   \r",
+							"            document.execCommand('copy');   \r",
+							"            document.body.removeChild(el);\r",
+							"        }\r",
+							"    </script>\r",
+							"    </head>\r",
+							"    <table bgcolor=\"#FFFFFF\">\r",
+							"    <caption>OneDrive root</caption>\r",
+							"        <tr>\r",
+							"            <th>Name</th>\r",
+							"            <th>URL</th>\r",
+							"            <th>Copy</th>\r",
+							"            <th>Size</th>\r",
+							"            <th>Application</th>\r",
+							"            <th>User</th>\r",
+							"            <th>File/Folder</th>\r",
+							"            <th>Child Count</th>            \r",
+							"        </tr>        \r",
+							"            <tr>\r",
+							"                <td>{{response.name}}</td>\r",
+							"                <td><a href='{{response.webUrl}}'>{{response.webUrl}}</a></td>\r",
+							"                <td><input class=\"button\" type=\"button\" width= onClick=\"copyToClipboard('{{response.webUrl}}')\" value='Copy Link' /></td>\r",
+							"                <td>{{response.size}}</td>\r",
+							"                <td>{{response.createdBy.application.displayName}}</td>\r",
+							"                <td>{{response.createdBy.user.displayName}}</td>\r",
+							"                <td>{{response.file.mimeType}}\r",
+							"                <td>{{response.folder.childCount}}</td>\r",
+							"            </tr>        \r",
+							"    </table>  \r",
+							"    </body>\r",
+							"</html>    \r",
+							"`;\r",
+							"\r",
+							"pm.visualizer.set(template, {\r",
+							"    // Pass the response body parsed as JSON as `data`\r",
+							"    response: pm.response.json()\r",
+							"});\r",
+							"}\r",
+							"catch (e) {\r",
+							"    console.log(e);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "SdkVersion",
+						"type": "text",
+						"value": "postman-graph/v1.0"
+					}
+				],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/me/drive/root",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"me",
+						"drive",
+						"root"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03 Get drive files",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"try {\r",
+							"    if (responseBody.indexOf(\"InvalidAuthenticationToken\") !== -1)\r",
+							"    {\r",
+							"        console.log(\"You need to run *On behalf of a User | Get User Access Token* request first.\");\r",
+							"    }\r",
+							"    else\r",
+							"    {\r",
+							"        if (pm.response.status === \"Forbidden\")\r",
+							"        {\r",
+							"            console.log(\"You need to add user delegated permissions in your application to at least *Files.Read* in portal.azure.com and then consent as user or Grant admin consent in portal. And re-run *On behalf of a User | Get User Access Token* request to update access token. \");\r",
+							"        }\r",
+							"    }\r",
+							"    var template = `\r",
+							"    <html>\r",
+							"    <body>\r",
+							"    <head>\r",
+							"   <style type=\"text/css\">\r",
+							"        body { font-size: 12px; background: #eee; padding: 16px;}\r",
+							"        td, th { font-size: 14px; background: #eee; padding: 7px; }\r",
+							"        caption{font-size:17px; font-weight:bold; margin-bottom:15px;}\r",
+							"        table{ margin:auto; width:80%}\r",
+							"        \r",
+							"    </style>\r",
+							"      <script>     \r",
+							"        function copyToClipboard(str){        \r",
+							"            var el = document.createElement('textarea');\r",
+							"            el.value = str;\r",
+							"            el.setAttribute('readonly', '');\r",
+							"            el.style = {position: 'absolute', left: '-999px'};\r",
+							"            document.body.appendChild(el);\r",
+							"            el.select();   \r",
+							"            document.execCommand('copy');   \r",
+							"            document.body.removeChild(el);\r",
+							"            var shell = new ActiveXObject(\"WScript.Shell\");\r",
+							"            shell.run(\"http://www.google.com\");            \r",
+							"        }\r",
+							"    </script>\r",
+							"    </head>\r",
+							"    <table bgcolor=\"#FFFFFF\">\r",
+							"    <caption>OneDrive Content</caption>\r",
+							"        <tr>\r",
+							"            <th>Name</th>\r",
+							"            <th>URL</th>\r",
+							"            <th>Copy</th>\r",
+							"            <th>Size</th>\r",
+							"            <th>Application</th>\r",
+							"            <th>User</th>\r",
+							"            <th>File/Folder</th>\r",
+							"            <th>Child Count</th>\r",
+							"            \r",
+							"        </tr>\r",
+							"\r",
+							"        {{#each response}}\r",
+							"            <tr>\r",
+							"                <td>{{name}}</td>\r",
+							"                <td><a href='{{webUrl}}'>{{webUrl}}</a></td>\r",
+							"                <td><input type=\"button\" onClick=\"copyToClipboard('{{webUrl}}')\" value='Copy Link' /></td>\r",
+							"                <td>{{size}}</td>\r",
+							"                <td>{{createdBy.application.displayName}}</td>\r",
+							"                <td>{{createdBy.user.displayName}}</td>\r",
+							"                <td>{{file.mimeType}}\r",
+							"                <td>{{folder.childCount}}</td>\r",
+							"            </tr>\r",
+							"        {{/each}}\r",
+							"    </table>\r",
+							"  \r",
+							"    </body>\r",
+							"</html>\r",
+							"    \r",
+							"`;\r",
+							"\r",
+							"pm.visualizer.set(template, {\r",
+							"    // Pass the response body parsed as JSON as `data`\r",
+							"    response: pm.response.json().value\r",
+							"});\r",
+							"}\r",
+							"catch (e) {\r",
+							"    console.log(e);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "SdkVersion",
+						"type": "text",
+						"value": "postman-graph/v1.0"
+					}
+				],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/me/drive/root/children",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"me",
+						"drive",
+						"root",
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04 Create a folder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"try {\r",
+							"    if (responseBody.indexOf(\"InvalidAuthenticationToken\") !== -1)\r",
+							"    {\r",
+							"        console.log(\"You need to run *On behalf of a User | Get User Access Token* request first.\");\r",
+							"    }\r",
+							"    else\r",
+							"    {\r",
+							"        if (pm.response.status === \"Forbidden\")\r",
+							"        {\r",
+							"            console.log(\"You need to add user delegated permissions in your application to at least *Files.ReadWrite* in portal.azure.com and then consent as user or Grant admin consent in portal. And re-run *On behalf of a User | Get User Access Token* request to update access token. \");\r",
+							"        }\r",
+							"    }\r",
+							"    pm.collectionVariables.set('FolderID',pm.response.json().id);\r",
+							"     var template = `\r",
+							"    <html>\r",
+							"    <body>\r",
+							"    <head>\r",
+							"   <style type=\"text/css\">\r",
+							"        body { font-size: 12px; background: #eee; padding: 16px;}\r",
+							"        td, th { font-size: 15px; background: #eee; padding: 16px;}\r",
+							"        .button{\r",
+							"            \r",
+							"            padding:3px;\r",
+							"        }\r",
+							"    </style>\r",
+							"      <script>     \r",
+							"        function copyToClipboard(str){        \r",
+							"            var el = document.createElement('textarea');\r",
+							"            el.value = str;\r",
+							"            el.setAttribute('readonly', '');\r",
+							"            el.style = {position: 'absolute', left: '-999px'};\r",
+							"            document.body.appendChild(el);\r",
+							"            el.select();   \r",
+							"            document.execCommand('copy');   \r",
+							"            document.body.removeChild(el);\r",
+							"        }\r",
+							"    </script>\r",
+							"    </head>\r",
+							"    <table bgcolor=\"#FFFFFF\">\r",
+							"        <tr>\r",
+							"            <th>Name</th>\r",
+							"            <th>URL</th>\r",
+							"            <th>Copy</th>\r",
+							"            <th>Size</th>\r",
+							"            <th>Application</th>\r",
+							"            <th>User</th>\r",
+							"            <th>File/Folder</th>\r",
+							"            <th>Child Count</th>            \r",
+							"        </tr>        \r",
+							"            <tr>\r",
+							"                <td>{{response.name}}</td>\r",
+							"                <td><a href='{{response.webUrl}}'>{{response.webUrl}}</a></td>\r",
+							"                <td><input class=\"button\" type=\"button\" width= onClick=\"copyToClipboard('{{response.webUrl}}')\" value='Copy Link' /></td>\r",
+							"                <td>{{response.size}}</td>\r",
+							"                <td>{{response.createdBy.application.displayName}}</td>\r",
+							"                <td>{{response.createdBy.user.displayName}}</td>\r",
+							"                <td>{{response.file.mimeType}}\r",
+							"                <td>{{response.folder.childCount}}</td>\r",
+							"            </tr>        \r",
+							"    </table>  \r",
+							"    </body>\r",
+							"</html>    \r",
+							"`;\r",
+							"\r",
+							"pm.visualizer.set(template, {\r",
+							"    // Pass the response body parsed as JSON as `data`\r",
+							"    response: pm.response.json()\r",
+							"});\r",
+							"}\r",
+							"catch (e) {\r",
+							"    console.log(e);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "SdkVersion",
+						"type": "text",
+						"value": "postman-graph/v1.0"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"postman-test02\",\n  \"folder\": {}\n}"
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/me/drive/root/children",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"me",
+						"drive",
+						"root",
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05 Upload a file (size < 4 MB)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/E:/postman/package.json"
+					}
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{Drive_id}}/items/{{FolderID}}:/package.json:/content",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{Drive_id}}",
+						"items",
+						"{{FolderID}}:",
+						"package.json:",
+						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "06 Create session for uploading a file",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"uploadUrl\");\r",
+							"});\r",
+							"pm.environment.set(\"FileUpload_URL\",pm.response.json().uploadUrl);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/E:/postman/package.json"
+					}
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{Drive_id}}/items/{{FolderID}}:/somefile.pdf:/createUploadSession",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{Drive_id}}",
+						"items",
+						"{{FolderID}}:",
+						"somefile.pdf:",
+						"createUploadSession"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "07 Upload Largefile",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/C:/Users/tapan/Desktop/somefile.pdf"
+					}
+				},
+				"url": {
+					"raw": "{{FileUpload_URL}}",
+					"host": [
+						"{{FileUpload_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "08 Delete Item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 (no content/deleted)\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AccessToken}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{Drive_id}}/items/{{FolderID}}",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{Drive_id}}",
+						"items",
+						"{{FolderID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Token",
+			"value": "EwB4A8l6BAAU6k7+XVQzkGyMv7VHB/h4cHbJYRAAAdH9Vp+04/ATSOd8RWxJjMEFYl8bywXt8jVlob0a6QtV+EiK/i4FGksMmqMFkd2YvUyB1WblDV0X18bIk51/FIPY9Qo2pB9NUTJrzgCaQ5DMFuFrWPaVQt8FOua9AOkz6qeOCk9FJHImaLSXIdlS3i50JgH2psbH2iGK19Dzdnc6WPAtRMt/cvKxi92MNYGJbZP08lW4gS3k1OrSHdv5f+pRdJLOJBzw9FRbSzV05vXqSiEgUPP/F/t+uuP3euasYr/XqWrVwNRZSvWs64f93QnvgPWvvN2IWF6dbYbw1hjIq/PEY9l5hfRkcazwtVFo3zzSKLpCwpGEXko5M68AAWcDZgAACMXcN2m8UA2gSAIJjllQ87iCed8PEKeRCtZ9EfEuQ3RU7auv8M3L4YGJ3bY1rNLu+1qbnh0z7d9PFLNw+wxfNb/TSlE5rvJGZBP5URJIWKOrrZi4z5IZdHD5dSZMJLxm7fcyWr27DpJSzDO6wXrXKaxoQXgYEoF/9kTxVz9WBoqBxRbvJDcOH48P7cT6F23rj2ISg87EVHM/9BV3Pf7p8uNsDtQJvzG0l627Gl+QDYegc1k3Olaj1ORFwTyTds/L47+EaHKM7T8J4X+Fq72zCexx735t4m7QRZGViFhGYb+NhPexH4VttrfICyNC+GUBuhm7Owx4Vt0YT0VLLVf1adrjgwT0BsZGrNgSR7riKzrQBe8dqw/gmqVksBebs+n66B+2KZaeiRFOe6oSyo/qQBnRJ63tDBZCmFb1zaC/StuSG8HPNKaBUp07IYdUuM9OclxJOQQgbz1eQREdRYrtVsxcDm/wAyCpLMRfP78mQiISazyvEhIJskKYHAy1XpVwH+OuBG/iTWWSu+Irhe0cIrZ3MiQCQVj9HXv8JyVV57Yc8ZuR7ksP5ObXx0j97wkbFu+bUHA2Jq5SfqzCe3MO2coGd/RDQ1uhVLFUImIYsYmDkWyL14M/FmsA/4R4GlVb7yWaZ1quL383cRT7jo23NZ98vwQ/eAg+i+BrYr2StWQbkAwer0pZYDpqSUBLZ/exgmuhX9P3jIRn6S7rf+GEDgXD1VTnntM5ZNJID+TPvJHT0l9aEGj3paDWklmbVGfsGKhMhpdyZ4up7Vi6vHAeJv3URYwC"
+		},
+		{
+			"key": "AccessToken",
+			"value": "EwB4A8l6BAAU6k7+XVQzkGyMv7VHB/h4cHbJYRAAAaDRsNxoAxQQHCe1DFr7sEIJowlfUo/WtPRBrd+t/7ymBLEjGui/tIKA1tW77vFAyx3D+GL9q4+oMl2gD7fZAYjRwPUp5M8YSKrB9ZhKzqSAXdhxQ7AGHGw449NQOmkhMbRl38SVtMKVzT17XtYWRBEJUgvd9PuMgHPFP2AL9RDc2Zd8hr1aCI7HSPFb4fyAa/A9kpf7ruvNDJMgYlXulWoopBnS7AT655+jfqGwX4CvRuftrZrJxo9oUkfGo8L8KJ3rbgcwYhAYlOL+ZGA2bURqrFaTZDZV6LL3Cs0P6MSTEKf5o876/RKCErTlxIc5G/RMKQa1qSbBLhm2yLQV9qcDZgAACC/AnB34YYDaSAJ8DeC6X4V7se7U5oAGmlXeqPdzMBwgPr575Sjd9dotqhh6Fn+QlKTyVUSF6rshz9V8dLi/uILm0hyWQc3Vz9lzx3pRqzd9iIVzPr11D0IgfhwblSTVraRP1jiWXnW+ijNR+rvcM71x0Gi0G1iKqgjYZi1zwnNPV8G0KOy/A0mQWR/fzynNdIV1lhclS58X3+q6fXa79G6ziaLuQRv2j7Ch9BBFdeIF/9NAXXIcNk7ImSIGDWT38vW97O3iprBWQIHH6YvRnPy2vMahYwKbRWWz0KFH7OktjAvtkxYjeQ09qv7fKTf5tORnhSY8EguoOWcbUZD7nf45F/8ezqraoG/VTF+g/VcocQ+EykW8kqMFRDiZiguRx0kIh7yeszldvpen+DTS50jkKB8Pdn2sa9v19HVrgXkhVnF80J6BJuCAk7u/Sc0HkY4SC9qzUG2BTcSRCmePBV2w2p225tjIi+XfNoD0nCLtDrHkQ1u9KdB67xTP2TtNBwjecGvUn/zhnqVA9N4jGuy3LYvk6fz0HYLAAvOmnlfgM6sf1YVVOh2SDnYjGVXwOlbdr65JHNrIGLDcG1GlbizG4K0NCnlhCberCToFJm5+jI5tOaZ5nG3FJsUhbz/OFBTILVD6KGgO0tOQYwsr0m8jTUgGSUlr1ved8DDhc1LKhUV7ITNjmzSnuvxokwyXO6K9pQ++W5VVE8i5TlWrmPYkFyjH4qTrTxdvCNwE4S2814Y/ES1U3B43nTPM2BSd7cGcGA4b2MOC9lRGaXeC81GZa4wC"
+		},
+		{
+			"key": "DriveID",
+			"value": ""
+		},
+		{
+			"key": "FolderID",
+			"value": ""
+		},
+		{
+			"key": "FileUploadURL",
+			"value": ""
+		}
+	]
+}
